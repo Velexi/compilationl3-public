@@ -16,21 +16,22 @@ mult ='*';
 div ='/';
 l_par ='(';
 r_par =')';
-equals = '=';
-semicolon = ';';
-or = '|';
-and = '&';
+egal = '=';
+pointvirgule = ';';
+ou = '|';
+et = '&';
 oaccolade = '{';
 caccolade = '}';
-obracket = '[';
-cbracket = ']';
-if = 'if';
-else = 'else';
-elseif = 'elseif';
-while = 'while';
-do = 'do';
-integer = 'integer';
-identif = 
+crochetouvrant = '[';
+crochetfermant = ']';
+si = 'si';
+sinon = 'sinon';
+tantque = 'tantque';
+faire = 'faire';
+entier = 'entier';
+identif='identif';
+exp='exp';
+bloc='bloc';
 
 Ignored Tokens
 
@@ -38,15 +39,15 @@ espaces, commentaire;
 
 Productions
 
-programme = DECLAVAR semicolon DECLAFONCT ;
+programme = declavar semicolon declafonct ;
 
-DECLAVAR =  {var} integer identif SEQVAR | 
-            {tableau} integer identif obracket EXP fbracket SEQVAR |
+declavar =  {var} entier identif seqvar |
+            {tableau} entier identif crochetouvrant exp crochetfermant seqvar |
             {rien} ;
 
-SEQVAR =    {seqvar} integer identif SEQVAR |
-            {seqtableau} integer identif obracket EXP fbracket SEQVAR |
+seqvar =    {seqvar} entier identif seqvar |
+            {seqtableau} entier identif crochetouvrant exp crochetfermant seqvar |
             {rien} ;
 
-DECLAFONCT = {fonction} identif l_par DECLAVAR r_par DECLAVAR BLOC DECLAFONCT ;
+declafonct = {fonction} identif l_par declavar r_par declavar bloc declafonct | {rien} ;
 
