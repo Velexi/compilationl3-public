@@ -3,11 +3,34 @@ Package sc;
 Helpers
 
 lettre = [['a' .. 'z'] + ['A' .. 'Z']];
+chiffres = ['0' .. '9'];
 
 Tokens
 
 espaces = (' ' | 13 | 10)+;
 commentaire= '#' [[0 .. 0xffff] - [10 + 13]]* (10 | 13 | 10 13);
+
+plus = '+';
+minus = '-';
+mult ='*';
+div ='/';
+l_par ='(';
+r_par =')';
+equals = '=';
+semicolon = ';';
+or = '|';
+and = '&';
+oaccolade = '{';
+caccolade = '}';
+obracket = '[';
+cbracket = ']';
+if = 'if';
+else = 'else';
+elseif = 'elseif';
+while = 'while';
+do = 'do';
+integer = 'integer';
+identif = 
 
 Ignored Tokens
 
@@ -15,5 +38,15 @@ espaces, commentaire;
 
 Productions
 
-programme = optdecvar listedecfonc ;
+programme = DECLAVAR semicolon DECLAFONCT ;
+
+DECLAVAR =  {var} integer identif SEQVAR | 
+            {tableau} integer identif obracket EXP fbracket SEQVAR |
+            {rien} ;
+
+SEQVAR =    {seqvar} integer identif SEQVAR |
+            {seqtableau} integer identif obracket EXP fbracket SEQVAR |
+            {rien} ;
+
+DECLAFONCT = {fonction} identif l_par DECLAVAR r_par DECLAVAR BLOC DECLAFONCT ;
 
