@@ -17,9 +17,11 @@ div ='/';
 l_par ='(';
 r_par =')';
 egal = '=';
+inf = '<';
 pointvirgule = ';';
 ou = '|';
 et = '&';
+not = '!';
 oaccolade = '{';
 caccolade = '}';
 crochetouvrant = '[';
@@ -29,9 +31,14 @@ sinon = 'sinon';
 tantque = 'tantque';
 faire = 'faire';
 entier = 'entier';
-identif='identif';
+identif=lettre+|'_'|'$'|chiffre*;
 exp='exp';
 bloc='bloc';
+alors = 'alors';
+return = 'return';
+ecrire = 'ecrire';
+lire = 'lire';
+main = 'main';
 
 Ignored Tokens
 
@@ -49,5 +56,52 @@ seqvar =    {seqvar} entier identif seqvar |
             {seqtableau} entier identif crochetouvrant exp crochetfermant seqvar |
             {rien} ;
 
-declafonct = {fonction} identif l_par declavar r_par declavar bloc declafonct | {rien} ;
+declafonct = {fonction} identif l_par declavar r_par declavar bloc declafonct | {rien};
+
+instruction = {instruction} affectation | sialors | sisinon | itantque | retour | appelsimple | appelpredefini | bloc;
+
+affectation = {affectation} identif = exp;
+
+sialors = {sialors} si exp alors instruction;
+
+itantque = {itantque} tantque exp faire instruction;
+
+retour = {retour} return exp;
+
+appelsimple = {appelsimple} appelfonction;
+
+appelpredefini = {appelpredefini} ecrire l_par exp r_par | lire l_par r_par;
+
+bloc = {bloc} oaccolade exp caccolade;
+
+listi = {listi} instuction listi | {rien};
+
+liste = {liste} prio1 listeprime | {rien};
+
+listeprime = {listeprime} prio1 liste | {rien};
+
+prio1 = {prio1} prio1 ou prio2 | prio2;
+
+prio2 = {prio2} prio2 et prio3 | prio3;
+
+prio3 = {prio3} prio3 egal prio4 | prio3 inf prio4 | prio4;
+
+prio4 = {prio4} prio4 plus prio5 | prio4 minus prio5 | prio5;
+
+prio5 = {prio5} prio5 mult prio6 | prio5 div prio6 | prio6;
+
+prio6 = {prio6} not prio7 | prio7;
+
+prio7 = {prio7} l_par prio1 r_par | nombre | appelfct | var;
+
+nombre = {nombre} nombre chiffre | chiffre;
+
+appelfct = {appelfct} identif l_par liste r_par;
+
+var = {var} identif;
+
+
+
+
+
 
