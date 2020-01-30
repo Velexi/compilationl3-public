@@ -37,6 +37,7 @@ return = 'return';
 ecrire = 'ecrire';
 lire = 'lire';
 main = 'main';
+chiffres=chiffres;
 
 Ignored Tokens
 
@@ -51,7 +52,7 @@ declavar =  {var} entier identif seqvar |
             {rien} ;
 
 seqvar =    {seqvar} entier identif seqvar |
-            {seqtableau} entier identif crochetouvrant exp crochetfermant seqvar |
+            {seqtableau} entier identif crochetouvrant nombre crochetfermant seqvar |
             {rien} ;
 
 declafonct = {fonction} identif lpar [tag1]:declavar rpar [tag2]:declavar bloc declafonct | {rien};
@@ -94,7 +95,7 @@ prio6 = {prio7} not prio7 | {prio77}prio7;
 
 prio7 =  {p} lpar prio1 rpar | {nombre}nombre | {appelfct} appelfct | {var}var;
 
-nombre =   {n} nombre chiffres | {c} chiffres;
+nombre =   {n} nombre chiffres | {c} chiffres ;
 
 appelfct =  identif lpar exp rpar;
 
