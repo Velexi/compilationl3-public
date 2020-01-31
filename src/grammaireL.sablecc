@@ -3,6 +3,9 @@ Package sc;
 Helpers
 
 lettre = [['a' .. 'z'] + ['A' .. 'Z']];
+chiffre = ['0' .. '9'];
+alpha = [lettre + ['_' + '$']];
+alphanum = [lettre + chiffre];
 
 
 Tokens
@@ -40,8 +43,8 @@ main = 'main';
 
 virgule = ',';
 
-identif = lettre lettre*;
 chiffre = ['0' .. '9']+;
+identif = alpha alphanum*;
 
 Ignored Tokens
 
