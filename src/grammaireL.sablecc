@@ -3,7 +3,7 @@ Package sc;
 Helpers
 
 lettre = [['a' .. 'z'] + ['A' .. 'Z']];
-chiffres = ['0' .. '9'];
+
 
 Tokens
 
@@ -31,13 +31,17 @@ sinon = 'sinon';
 tantque = 'tantque';
 faire = 'faire';
 entier = 'entier';
-identif=lettre+|'_'*|'$'*|chiffres*;
+
 alors = 'alors';
 return = 'return';
 ecrire = 'ecrire';
 lire = 'lire';
 main = 'main';
-chiffres=chiffres;
+
+virgule = ',';
+
+identif = lettre lettre*;
+chiffre = ['0' .. '9']+;
 
 Ignored Tokens
 
@@ -45,64 +49,100 @@ espaces, commentaire;
 
 Productions
 
-programme = declavar pointvirgule declafonct ;
+programme = optdecvar listfonct ;
 
-declavar =  {var} entier identif seqvar |
-            {tableau} entier identif crochetouvrant exp crochetfermant seqvar |
-            {rien} ;
+optdecvar =
+    {decla_glob} declavarliste |
+    {vide};
 
-seqvar =    {seqvar} entier identif seqvar |
-            {seqtableau} entier identif crochetouvrant nombre crochetfermant seqvar |
-            {rien} ;
+listfonct =
+			{list_fonct} declafonct listfonct |
+			{main} main_fonct;
 
-declafonct = {fonction} identif lpar [tag1]:declavar rpar [tag2]:declavar bloc declafonct | {rien};
+main_fonct =
+			{main_fonction} main lpar rpar optdecvar bloc;
 
-instruction =  {affectation} affectation | {sialors} sialors | {sisinon} sisinon | {itantque} itantque |{retour} retour | {appelsimple} appelsimple | {appelpredefini} appelpredefini | {bloc} bloc;
+list_exp =
+			{list} exp list_exp_suiv |
+			{rien};
 
-affectation =  identif egal exp;
+list_exp_suiv =
+            {list_exp} virgule exp list_exp_suiv |
+            {rien};
 
-sialors =  si exp alors instruction;
 
-sisinon =  si exp alors [tag1]:instruction sinon [tag2]:instruction;
+declavarliste = {pv} entier variable pointvirgule |
+                {list} entier variable virgule declavarliste |
+                {seule}entier variable;
 
-itantque =  tantque exp faire instruction;
+
+declafonct = {decla_fnct} identif lpar optdecvar rpar  bloc;
+
+instruction =  {affectation} affectation pointvirgule | {si} si exp alors bloc sinon_instr | {itantque} itantque |{retour} retour pointvirgule | {appelsimple} appelfct pointvirgule| {bloc} bloc;
+
+affectation =  variable egal exp;
+
+sinon_instr =
+        {sinon} sinon bloc |
+        {rien} ;
+
+itantque =  tantque exp faire bloc;
 
 retour =  return exp;
 
-appelsimple =  appelfct;
 
 appelpredefini =  {ecrire} ecrire lpar exp rpar | {lire} lire lpar rpar;
 
-bloc = {bloc} oaccolade exp caccolade;
+bloc = {bloc} oaccolade list_instr caccolade;
 
-listi =  {i} instruction listi | {rien};
+exp =
+		{ou} exp ou prio1|
+		{prio1} prio1;
 
-exp = {exp} prio1 listeprime | {rien};
+prio1 =
+		{et} prio1 et prio2 |
+		{prio2} prio2;
 
-listeprime = {prio1} prio1 exp | {rien};
+prio2 =
+		{egal} prio2 egal prio3 |
+		{infer} prio2 infer prio3 |
+		{prio3}prio3;
 
-prio1 = {prio2} prio1 ou prio2 | {prio22} prio2;
+prio3 =
+		{plus} prio3 plus prio4 |
+		{moin} prio3 minus prio4 |
+		{prio3}prio4;
 
-prio2 = {prio3} prio2 et prio3 | {prio33} prio3;
+prio4 =
+		{plus} prio4 mult prio5 |
+		{moin} prio4 div prio5 |
+		{prio4}prio5;
 
-prio3 = {prio4} prio3 egal prio4 |{prio44} prio3 infer prio4 | {prio444} prio4;
+prio5 =
+		{not} not lpar prio6 rpar |
+		{prio5}prio6;
 
-prio4 = {prio5} prio4 plus prio5 | {prio55} prio4 minus prio5 | {prio555}prio5;
+prio6 =
+		{par} lpar exp rpar |
+		{nombre} nombre |
+		{var} variable |
+		{appelfct} appelfct ;
 
-prio5 = {prio6} prio5 mult prio6 |{prio66} prio5 div prio6 |{prio666} prio6;
+nombre =
+            {chiffres} chiffre nombre |
+            {chiffre} chiffre;
 
-prio6 = {prio7} not prio7 | {prio77}prio7;
+appelfct =  {apl_fct} identif lpar list_exp rpar |
+            {ecrire} ecrire lpar exp rpar |
+            {lire} lire lpar rpar;
 
-prio7 =  {p} lpar prio1 rpar | {nombre}nombre | {appelfct} appelfct | {var}var;
+variable = 	{entier} identif |
+            {tableau} identif crochetouvrant nombre crochetfermant;
 
-nombre =   {n} nombre chiffres | {c} chiffres ;
+list_instr =    {list_instr} instruction sous_list_inst |
+             {vide};
 
-appelfct =  identif lpar exp rpar;
-
-var = identif;
-
-
-
-
-
+sous_list_inst =
+        {sous_list} instruction sous_list_inst |
+        {vide};
 
