@@ -79,7 +79,7 @@ declavarliste = {pv} entier variable pointvirgule |
                 {seule}entier variable;
 
 
-declafonct = {decla_fnct} identif lpar optdecvar rpar  bloc;
+declafonct = {decla_fnct} identif lpar [params]:optdecvar rpar [localv]:optdecvar  bloc;
 
 instruction =  {affectation} affectation pointvirgule | {si} si exp alors bloc sinon_instr | {itantque} itantque |{retour} retour pointvirgule | {appelsimple} appelfct pointvirgule| {bloc} bloc;
 
@@ -117,8 +117,8 @@ prio3 =
 		{prio3}prio4;
 
 prio4 =
-		{plus} prio4 mult prio5 |
-		{moin} prio4 div prio5 |
+		{mult} prio4 mult prio5 |
+		{div} prio4 div prio5 |
 		{prio4}prio5;
 
 prio5 =
