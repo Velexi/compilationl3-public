@@ -35,8 +35,7 @@ public class Sc2sa extends DepthFirstAdapter {
     }
 
     @Override
-    public void caseAVideOptdecvar(AVideOptdecvar node) {
-        node.apply(this);
+    public void caseAVideOptdecvar(AVideOptdecvar node){
         this.returnValue = null;
     }
 
@@ -83,7 +82,6 @@ public class Sc2sa extends DepthFirstAdapter {
 
     @Override
     public void caseARienListExp(ARienListExp node) {
-        node.apply(this);
         this.returnValue = null;
     }
 
@@ -101,7 +99,6 @@ public class Sc2sa extends DepthFirstAdapter {
 
     @Override
     public void caseARienListExpSuiv(ARienListExpSuiv node) {
-        node.apply(this);
         this.returnValue = null;
     }
 
@@ -219,7 +216,6 @@ public class Sc2sa extends DepthFirstAdapter {
 
     @Override
     public void caseARienSinonInstr(ARienSinonInstr node) {
-        node.apply(this);
         this.returnValue = null;
     }
 
@@ -254,7 +250,6 @@ public class Sc2sa extends DepthFirstAdapter {
 
     @Override
     public void caseALireAppelpredefini(ALireAppelpredefini node) {
-        node.apply(this);
         this.returnValue = new SaExpLire();
 
     }
