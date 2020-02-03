@@ -1,5 +1,4 @@
 Package sc;
-
 Helpers
 
 lettre = [['a' .. 'z'] + ['A' .. 'Z']];
@@ -7,43 +6,37 @@ chiffre = ['0' .. '9'];
 alpha = [lettre + ['_' + '$']];
 alphanum = [lettre + chiffre];
 
-
 Tokens
 
 espaces = (' ' | 13 | 10)+;
 commentaire= '#' [[0 .. 0xffff] - [10 + 13]]* (10 | 13 | 10 13);
-
-plus = '+';
-minus = '-';
-mult ='*';
-div ='/';
-lpar ='(';
-rpar =')';
-egal = '=';
-infer = '<';
+virgule = ',';
+div = '/';
 pointvirgule = ';';
-ou = '|';
-et = '&';
-not = '!';
-oaccolade = '{';
-caccolade = '}';
+mult = '*';
+moins = '-';
+lpar = '(';
+rpar = ')';
 crochetouvrant = '[';
 crochetfermant = ']';
+accoladeouvrante = '{';
+accoladefermante = '}';
+egal = '=';
+inf = '<';
+et = '&';
+ou = '|';
+non = '!';
+plus = '+';
 si = 'si';
+alors = 'alors';
 sinon = 'sinon';
 tantque = 'tantque';
 faire = 'faire';
 entier = 'entier';
-
-alors = 'alors';
-return = 'return';
-ecrire = 'ecrire';
+retour = 'retour';
 lire = 'lire';
-main = 'main';
-
-virgule = ',';
-
-chiffre = ['0' .. '9']+;
+ecrire = 'ecrire';
+nombre = chiffre+;
 identif = alpha alphanum*;
 
 Ignored Tokens
@@ -52,100 +45,20 @@ espaces, commentaire;
 
 Productions
 
-programme = optdecvar listfonct ;
+programme = {variables_et_fonctions} optdecvar liste_de_fonc |
+            {liste_de_fonctions} liste_de_fonc;
 
-optdecvar =
-    {decla_glob} declavarliste |
-    {vide};
+optdecvar = liste_de_variables pointvirgule;
 
-listfonct =
-			{list_fonct} declafonct listfonct |
-			{main} main_fonct;
+liste_de_variables = {declaration_variables} virgule dec_var liste_de_var |
+                     {declaration_une_variable} virgule dec_var;
 
-main_fonct =
-			{main_fonction} main lpar rpar optdecvar bloc;
+dec_var = {var_entier} entier identif |
+          {var_tableau} entier identif crochetouvrant nombre crocher_fermant;
 
-list_exp =
-			{list} exp list_exp_suiv |
-			{rien};
+liste_de_fonc = {liste_de_fonctions} dec_fonc liste_de_fonc |
+                {fin_de_liste} ;
 
-list_exp_suiv =
-            {list_exp} virgule exp list_exp_suiv |
-            {rien};
-
-
-declavarliste = {pv} entier variable pointvirgule |
-                {list} entier variable virgule declavarliste |
-                {seule}entier variable;
-
-
-declafonct = {decla_fnct} identif lpar [params]:optdecvar rpar [localv]:optdecvar  bloc;
-
-instruction =  {affectation} affectation pointvirgule | {si} si exp alors bloc sinon_instr | {itantque} itantque |{retour} retour pointvirgule | {appelsimple} appelfct pointvirgule| {bloc} bloc;
-
-affectation =  variable egal exp;
-
-sinon_instr =
-        {sinon} sinon bloc |
-        {rien} ;
-
-itantque =  tantque exp faire bloc;
-
-retour =  return exp;
-
-
-appelpredefini =  {ecrire} ecrire lpar exp rpar | {lire} lire lpar rpar;
-
-bloc = {bloc} oaccolade list_instr caccolade;
-
-exp =
-		{ou} exp ou prio1|
-		{prio1} prio1;
-
-prio1 =
-		{et} prio1 et prio2 |
-		{prio2} prio2;
-
-prio2 =
-		{egal} prio2 egal prio3 |
-		{infer} prio2 infer prio3 |
-		{prio3}prio3;
-
-prio3 =
-		{plus} prio3 plus prio4 |
-		{moin} prio3 minus prio4 |
-		{prio3}prio4;
-
-prio4 =
-		{mult} prio4 mult prio5 |
-		{div} prio4 div prio5 |
-		{prio4}prio5;
-
-prio5 =
-		{not} not lpar prio6 rpar |
-		{prio5}prio6;
-
-prio6 =
-		{par} lpar exp rpar |
-		{nombre} nombre |
-		{var} variable |
-		{appelfct} appelfct ;
-
-nombre =
-            {chiffres} chiffre nombre |
-            {chiffre} chiffre;
-
-appelfct =  {apl_fct} identif lpar list_exp rpar |
-            {ecrire} ecrire lpar exp rpar |
-            {lire} lire lpar rpar;
-
-variable = 	{entier} identif |
-            {tableau} identif crochetouvrant nombre crochetfermant;
-
-list_instr =    {list_instr} instruction sous_list_inst |
-             {vide};
-
-sous_list_inst =
-        {sous_list} instruction sous_list_inst |
-        {vide};
+dec_fonc = {fonction_avec_var_locales} identif parametres optdecvar bloc_instructions |
+           {fonction_sans_var_locales} identif parametres bloc_instructions ;
 
