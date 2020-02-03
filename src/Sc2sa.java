@@ -271,20 +271,26 @@ public class Sc2sa extends DepthFirstAdapter {
 
     @Override
     public void caseAInstructionAppel(AInstructionAppel node) {
-        String nom=null;
-        SaLExp args=null;
-
-        this.returnValue = new SaAppel(nom,args);
+        SaAppel appel = null;
+        node.getAppelFonction().apply(this);
+        appel = (SaAppel) this.returnValue;
+        this.returnValue = new SaAppel(appel.getNom(),appel.getArguments());
     }
 
     @Override
     public void caseAInstructionRetour(AInstructionRetour node) {
-        super.caseAInstructionRetour(node);
+        SaExp val=null;
+        node.getExpression().apply(this);
+        val = (SaExp) this.returnValue;
+        this.returnValue = new SaInstRetour(val);
     }
 
     @Override
     public void caseAInstructionEcriture(AInstructionEcriture node) {
-        super.caseAInstructionEcriture(node);
+        SaExp arg;
+        node.getExpression().apply(this);
+        arg = (SaExp) this.returnValue;
+        this.returnValue = new SaInstEcriture(arg);
     }
 
     @Override
@@ -294,37 +300,69 @@ public class Sc2sa extends DepthFirstAdapter {
 
     @Override
     public void caseAListeInstructionsListeInstructions(AListeInstructionsListeInstructions node) {
-        super.caseAListeInstructionsListeInstructions(node);
+        SaInst tete=null;
+        SaLInst queue=null;
+        node.getInstruction().apply(this);
+        tete = (SaInst) this.returnValue;
+        node.getListeInstructions().apply(this);
+        queue = (SaLInst) this.returnValue;
+        this.returnValue = new SaLInst(tete,queue);
     }
 
     @Override
     public void caseAFinRecInstrListeInstructions(AFinRecInstrListeInstructions node) {
-        super.caseAFinRecInstrListeInstructions(node);
+        this.returnValue = null;
     }
 
     @Override
     public void caseAOuExpression(AOuExpression node) {
-        super.caseAOuExpression(node);
+        SaExp op2=null;
+        SaExp op1=null;
+        node.getExpression().apply(this);
+        op1 = (SaExp) this.returnValue;
+        node.getE1().apply(this);
+        op2 = (SaExp) this.returnValue;
+        this.returnValue = new SaExpOr(op1,op2);
     }
 
     @Override
     public void caseAE1Expression(AE1Expression node) {
-        super.caseAE1Expression(node);
+        SaExp exp;
+
+        node.getE1().apply(this);
+        exp = (SaExp) this.returnValue;
+        this.returnValue = exp;
     }
 
     @Override
     public void caseAEtE1(AEtE1 node) {
-        super.caseAEtE1(node);
+        SaExp op1=null;
+        SaExp op2=null;
+        node.getE1().apply(this);
+        op1 = (SaExp) this.returnValue;
+        node.getE2().apply(this);
+        op2 = (SaExp) this.returnValue;
+        this.returnValue = new SaExpAnd(op1,op2);
     }
 
     @Override
     public void caseAE2E1(AE2E1 node) {
-        super.caseAE2E1(node);
+        SaExp exp;
+
+        node.getE2().apply(this);
+        exp = (SaExp) this.returnValue;
+        this.returnValue = exp;
     }
 
     @Override
     public void caseAInferieurE2(AInferieurE2 node) {
-        super.caseAInferieurE2(node);
+        SaExp op1=null;
+        SaExp op2=null;
+        node.getE2().apply(this);
+        op1 = (SaExp) this.returnValue;
+        node.getE3().apply(this);
+        op2 = (SaExp) this.returnValue;
+        this.returnValue = new SaExpInf(op1,op2);
     }
 
     @Override
@@ -334,7 +372,11 @@ public class Sc2sa extends DepthFirstAdapter {
 
     @Override
     public void caseAE3E2(AE3E2 node) {
-        super.caseAE3E2(node);
+        SaExp exp;
+
+        node.getE3().apply(this);
+        exp = (SaExp) this.returnValue;
+        this.returnValue = exp;
     }
 
     @Override
@@ -348,8 +390,12 @@ public class Sc2sa extends DepthFirstAdapter {
     }
 
     @Override
-    public void caseAE4E3(AE4E3 node) {
-        super.caseAE4E3(node);
+    public void caseAE4E3(AE4E3 node){
+        SaExp exp;
+
+        node.getE4().apply(this);
+        exp = (SaExp) this.returnValue;
+        this.returnValue = exp;
     }
 
     @Override
@@ -364,7 +410,11 @@ public class Sc2sa extends DepthFirstAdapter {
 
     @Override
     public void caseAE5E4(AE5E4 node) {
-        super.caseAE5E4(node);
+        SaExp exp;
+
+        node.getE5().apply(this);
+        exp = (SaExp) this.returnValue;
+        this.returnValue = exp;
     }
 
     @Override
@@ -374,7 +424,11 @@ public class Sc2sa extends DepthFirstAdapter {
 
     @Override
     public void caseAE6E5(AE6E5 node) {
-        super.caseAE6E5(node);
+        SaExp exp;
+
+        node.getE6().apply(this);
+        exp = (SaExp) this.returnValue;
+        this.returnValue = exp;
     }
 
     @Override
