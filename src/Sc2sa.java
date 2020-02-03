@@ -367,7 +367,13 @@ public class Sc2sa extends DepthFirstAdapter {
 
     @Override
     public void caseAEgalE2(AEgalE2 node) {
-        super.caseAEgalE2(node);
+        SaExp op1=null;
+        SaExp op2=null;
+        node.getE2().apply(this);
+        op1 = (SaExp) this.returnValue;
+        node.getE3().apply(this);
+        op2 = (SaExp) this.returnValue;
+        this.returnValue = new SaExpEqual(op1,op2);
     }
 
     @Override
@@ -380,13 +386,25 @@ public class Sc2sa extends DepthFirstAdapter {
     }
 
     @Override
-    public void caseAPlusE3(APlusE3 node) {
-        super.caseAPlusE3(node);
+    public void caseAPlusE3(APlusE3 node){
+        SaExp op1=null;
+        SaExp op2=null;
+        node.getE3().apply(this);
+        op1 = (SaExp) this.returnValue;
+        node.getE4().apply(this);
+        op2 = (SaExp) this.returnValue;
+        this.returnValue = new SaExpAdd(op1,op2);
     }
 
     @Override
     public void caseAMoinsE3(AMoinsE3 node) {
-        super.caseAMoinsE3(node);
+        SaExp op1=null;
+        SaExp op2=null;
+        node.getE3().apply(this);
+        op1 = (SaExp) this.returnValue;
+        node.getE4().apply(this);
+        op2 = (SaExp) this.returnValue;
+        this.returnValue = new SaExpSub(op1,op2);
     }
 
     @Override
@@ -400,12 +418,24 @@ public class Sc2sa extends DepthFirstAdapter {
 
     @Override
     public void caseAMultiplicationE4(AMultiplicationE4 node) {
-        super.caseAMultiplicationE4(node);
+        SaExp op1=null;
+        SaExp op2=null;
+        node.getE4().apply(this);
+        op1 = (SaExp) this.returnValue;
+        node.getE5().apply(this);
+        op2 = (SaExp) this.returnValue;
+        this.returnValue = new SaExpMult(op1,op2);
     }
 
     @Override
     public void caseADivisionE4(ADivisionE4 node) {
-        super.caseADivisionE4(node);
+        SaExp op1=null;
+        SaExp op2=null;
+        node.getE4().apply(this);
+        op1 = (SaExp) this.returnValue;
+        node.getE5().apply(this);
+        op2 = (SaExp) this.returnValue;
+        this.returnValue = new SaExpDiv(op1,op2);
     }
 
     @Override
@@ -419,7 +449,10 @@ public class Sc2sa extends DepthFirstAdapter {
 
     @Override
     public void caseANonLogiqueE5(ANonLogiqueE5 node) {
-        super.caseANonLogiqueE5(node);
+        SaExp op1=null;
+        node.getE5().apply(this);
+        op1 = (SaExp) this.returnValue;
+        this.returnValue = new SaExpNot(op1);
     }
 
     @Override
@@ -433,12 +466,18 @@ public class Sc2sa extends DepthFirstAdapter {
 
     @Override
     public void caseAAppelFctE6(AAppelFctE6 node) {
-        super.caseAAppelFctE6(node);
+        SaAppel appel = null;
+        node.getAppelFonction().apply(this);
+        appel = (SaAppel) this.returnValue;
+        this.returnValue = new SaAppel(appel.getNom(),appel.getArguments());
     }
 
     @Override
     public void caseAVariableE6(AVariableE6 node) {
-        super.caseAVariableE6(node);
+        SaVar var = null;
+        node.getVariable().apply(this);
+        var = (SaVar) this.returnValue;
+        this.returnValue = var;
     }
 
     @Override
@@ -448,51 +487,91 @@ public class Sc2sa extends DepthFirstAdapter {
 
     @Override
     public void caseANombreE6(ANombreE6 node) {
-        super.caseANombreE6(node);
+        int val;
+        node.getNombre().apply(this);
+        val = Integer.parseInt(this.returnValue.toString());
+        this.returnValue = new SaExpInt(val);
     }
 
     @Override
     public void caseALireE6(ALireE6 node) {
-        super.caseALireE6(node);
+        this.returnValue = new SaExpLire();
     }
 
     @Override
     public void caseAVariableSimpleVariable(AVariableSimpleVariable node) {
-        super.caseAVariableSimpleVariable(node);
+        String nom;
+        node.getIdentif().apply(this);
+        nom = this.returnValue.toString();
+        this.returnValue = new SaVarSimple(nom);
     }
 
     @Override
     public void caseAVariableTableauVariable(AVariableTableauVariable node) {
-        super.caseAVariableTableauVariable(node);
+        int taille;
+        String nom;
+        node.getIdentif().apply(this);
+        nom = this.returnValue.toString();
+        node.getExpression().apply(this);
+        taille = Integer.parseInt(this.returnValue.toString());
+        this.returnValue = new SaDecTab(nom,taille);
     }
 
     @Override
     public void caseAListeExpressionsListeExpressions(AListeExpressionsListeExpressions node) {
-        super.caseAListeExpressionsListeExpressions(node);
+        SaExp tete=null;
+        SaLExp queue=null;
+        node.getExpression().apply(this);
+        tete = (SaExp) this.returnValue;
+        node.getListeExp().apply(this);
+        queue = (SaLExp) this.returnValue;
+        this.returnValue = new SaLExp(tete,queue);
     }
 
     @Override
     public void caseAFinRecExpressionsListeExpressions(AFinRecExpressionsListeExpressions node) {
-        super.caseAFinRecExpressionsListeExpressions(node);
+        SaExp exp= null;
+        node.getExpression().apply(this);
+        exp = (SaExp) this.returnValue;
+        this.returnValue = exp;
     }
 
     @Override
     public void caseARecListeExp(ARecListeExp node) {
-        super.caseARecListeExp(node);
+        SaExp tete=null;
+        SaLExp queue=null;
+        node.getExpression().apply(this);
+        tete = (SaExp) this.returnValue;
+        node.getListeExp().apply(this);
+        queue = (SaLExp) this.returnValue;
+        this.returnValue = new SaLExp(tete,queue);
     }
 
     @Override
     public void caseAFinRecExpListeExp(AFinRecExpListeExp node) {
-        super.caseAFinRecExpListeExp(node);
+        SaExp exp= null;
+        node.getExpression().apply(this);
+        exp = (SaExp) this.returnValue;
+        this.returnValue = exp;
     }
 
     @Override
     public void caseAAvecParametresAppelFonction(AAvecParametresAppelFonction node) {
-        super.caseAAvecParametresAppelFonction(node);
+        SaLExp args;
+        String nom;
+        node.getIdentif().apply(this);
+        nom = this.returnValue.toString();
+        args = (SaLExp) this.returnValue;
+        this.returnValue = new SaAppel(nom,args);
     }
 
     @Override
     public void caseASansParametresAppelFonction(ASansParametresAppelFonction node) {
-        super.caseASansParametresAppelFonction(node);
+        String nom;
+        SaAppel val=null;
+        node.getIdentif().apply(this);
+        nom = this.returnValue.toString();
+        val = new SaAppel(nom,null);
+        this.returnValue = new SaExpAppel(val);
     }
 }
