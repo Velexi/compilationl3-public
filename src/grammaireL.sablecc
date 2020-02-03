@@ -12,7 +12,7 @@ espaces = (' ' | 13 | 10)+;
 commentaire= '#' [[0 .. 0xffff] - [10 + 13]]* (10 | 13 | 10 13);
 virgule = ',';
 div = '/';
-pointvirgule = ';';
+point_virgule = ';';
 mult = '*';
 moins = '-';
 lpar = '(';
@@ -48,13 +48,13 @@ Productions
 programme = {variables_et_fonctions} optdecvar liste_de_fonc |
             {liste_de_fonctions} liste_de_fonc;
 
-optdecvar = liste_de_variables pointvirgule;
+optdecvar = liste_de_variables point_virgule;
 
-liste_de_variables = {declaration_variables} virgule dec_var liste_de_var |
+liste_de_variables = {declaration_variables} virgule dec_var liste_de_variables |
                      {declaration_une_variable} virgule dec_var;
 
 dec_var = {var_entier} entier identif |
-          {var_tableau} entier identif crochetouvrant nombre crocher_fermant;
+          {var_tableau} entier identif crochetouvrant nombre crochetfermant;
 
 liste_de_fonc = {liste_de_fonctions} dec_fonc liste_de_fonc |
                 {fin_de_liste} ;
@@ -62,3 +62,78 @@ liste_de_fonc = {liste_de_fonctions} dec_fonc liste_de_fonc |
 dec_fonc = {fonction_avec_var_locales} identif parametres optdecvar bloc_instructions |
            {fonction_sans_var_locales} identif parametres bloc_instructions ;
 
+parametres = {sans_parametres} lpar rpar |
+             {avec_parametres} lpar liste_de_variables rpar;
+
+instruction = {instruction_affect} affectation |
+               {bloc_instructions} bloc_instructions |
+               {instruction_si} instruction_si |
+               {instruction_tantque} instruction_tantque |
+               {instruction_appel} instruction_appel |
+               {instruction_retour} instruction_retour |
+               {instruction_ecriture} instruction_ecriture |
+               {fin_point_virgule} fin;
+
+affectation = variable egal expression point_virgule;
+
+bloc_instructions = accoladeouvrante liste_instructions accoladefermante;
+
+instruction_si = {si_sinon} si expression alors bloc_instructions instruction_sinon |
+                 {si} si expression alors bloc_instructions;
+
+instruction_sinon = sinon bloc_instructions;
+
+instruction_tantque = tantque expression faire bloc_instructions;
+
+instruction_appel = appel_fonction point_virgule;
+
+instruction_retour = retour expression point_virgule;
+
+instruction_ecriture = ecrire lpar expression rpar point_virgule;
+
+fin = point_virgule;
+
+liste_instructions = {liste_instructions} instruction liste_instructions |
+                     {fin_rec_instr} ;
+
+
+expression = {ou} expression ou e1 |
+             {e1} e1;
+
+e1 = {et} e1 et e2 |
+     {e2} e2;
+
+e2 = {inferieur} e2 inf e3 |
+     {egal} e2 egal e3 |
+     {e3} e3;
+
+e3 = {plus} e3 plus e4 |
+     {moins} e3 moins e4 |
+     {e4} e4;
+
+e4 = {multiplication} e4 mult e5 |
+     {division} e4 div e5 |
+     {e5} e5;
+
+e5 = {non_logique} non e5 |
+     {e6} e6;
+
+e6 = {appel_fct} appel_fonction |
+     {variable} variable |
+     {parentheses} lpar expression rpar |
+     {nombre} nombre |
+     {lire} lire lpar rpar ;
+
+
+variable = {variable_simple} identif |
+           {variable_tableau} identif crochetouvrant expression crochetfermant;
+
+
+liste_expressions = {liste_expressions} expression liste_exp |
+                    {fin_rec_expressions} expression;
+
+liste_exp = {rec} virgule expression liste_exp |
+            {fin_rec_exp} virgule expression;
+
+appel_fonction = {avec_parametres} identif lpar liste_expressions rpar |
+                 {sans_parametres} identif lpar rpar;
