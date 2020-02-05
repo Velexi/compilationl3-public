@@ -1,4 +1,5 @@
 Package sc;
+
 Helpers
 
 lettre = [['a' .. 'z'] + ['A' .. 'Z']];
@@ -11,18 +12,18 @@ Tokens
 espaces = (' ' | 13 | 10)+;
 commentaire= '#' [[0 .. 0xffff] - [10 + 13]]* (10 | 13 | 10 13);
 virgule = ',';
-div = '/';
+divise = '/';
 point_virgule = ';';
-mult = '*';
+fois = '*';
 moins = '-';
-lpar = '(';
-rpar = ')';
-crochetouvrant = '[';
-crochetfermant = ']';
-accoladeouvrante = '{';
-accoladefermante = '}';
+parenthese_ouvrante = '(';
+parenthese_fermante = ')';
+crochet_ouvrant = '[';
+crochet_fermant = ']';
+accolade_ouvrante = '{';
+accolade_fermante = '}';
 egal = '=';
-inf = '<';
+inferieur = '<';
 et = '&';
 ou = '|';
 non = '!';
@@ -45,95 +46,130 @@ espaces, commentaire;
 
 Productions
 
-programme = {variables_et_fonctions} optdecvar liste_de_fonc |
-            {liste_de_fonctions} liste_de_fonc;
+programme =
+{decvarldecfonc} optdecvar listedecfonc |
+{ldecfonc} listedecfonc;
 
-optdecvar = liste_de_variables point_virgule;
+optdecvar = listedecvar point_virgule;
 
-liste_de_variables = {declaration_variables} virgule dec_var liste_de_variables |
-                     {declaration_une_variable} virgule dec_var;
+listedecvar =
+{decvarldecvar} decvar listedecvarbis |
+{decvar} decvar;
 
-dec_var = {var_entier} entier identif |
-          {var_tableau} entier identif crochetouvrant nombre crochetfermant;
+listedecvarbis =
+{decvarldecvar} virgule decvar listedecvarbis|
+{decvar} virgule decvar ;
 
-liste_de_fonc = {liste_de_fonctions} dec_fonc liste_de_fonc |
-                {fin_de_liste} ;
+decvar =
+{decvarentier} entier identif |
+{decvartableau} entier identif crochet_ouvrant nombre crochet_fermant ;
 
-dec_fonc = {fonction_avec_var_locales} identif parametres optdecvar bloc_instructions |
-           {fonction_sans_var_locales} identif parametres bloc_instructions ;
+listedecfonc =
+{ldecfoncrec} decfonc listedecfonc |
+{ldecfoncfinal} ;
 
-parametres = {sans_parametres} lpar rpar |
-             {avec_parametres} lpar liste_de_variables rpar;
+decfonc =
+{decvarinstr} identif listeparam optdecvar instrbloc |
+{instr} identif listeparam instrbloc ;
 
-instruction = {instruction_affect} affectation |
-               {bloc_instructions} bloc_instructions |
-               {instruction_si} instruction_si |
-               {instruction_tantque} instruction_tantque |
-               {instruction_appel} instruction_appel |
-               {instruction_retour} instruction_retour |
-               {instruction_ecriture} instruction_ecriture |
-               {fin_point_virgule} fin;
+listeparam =
+{sansparam} parenthese_ouvrante parenthese_fermante |
+{avecparam} parenthese_ouvrante listedecvar parenthese_fermante ;
 
-affectation = variable egal expression point_virgule;
+instr =
+{instraffect} instraffect |
+{instrbloc } instrbloc |
+{instrsi } instrsi |
+{instrtantque } instrtantque |
+{instrappel } instrappel |
+{instrretour } instrretour |
+{instrecriture } instrecriture |
+{instrvide} instrvide ;
 
-bloc_instructions = accoladeouvrante liste_instructions accoladefermante;
+instraffect = var egal exp point_virgule ;
 
-instruction_si = {si_sinon} si expression alors bloc_instructions instruction_sinon |
-                 {si} si expression alors bloc_instructions;
+instrbloc = accolade_ouvrante listeinst accolade_fermante ;
 
-instruction_sinon = sinon bloc_instructions;
+//listeinst = instr*;
 
-instruction_tantque = tantque expression faire bloc_instructions;
+listeinst =
+{linstrec} instr listeinst |
+{linstfinal} ;
 
-instruction_appel = appel_fonction point_virgule;
+instrsi =
+{avecsinon} si exp alors instrbloc instrsinon |
+{sanssinon} si exp alors instrbloc ;
 
-instruction_retour = retour expression point_virgule;
+instrsinon = sinon instrbloc ;
 
-instruction_ecriture = ecrire lpar expression rpar point_virgule;
+instrtantque = tantque exp faire instrbloc ;
 
-fin = point_virgule;
+instrappel = appelfct point_virgule ;
 
-liste_instructions = {liste_instructions} instruction liste_instructions |
-                     {fin_rec_instr} ;
+instrretour = retour exp point_virgule ;
 
+instrecriture = ecrire parenthese_ouvrante exp parenthese_fermante point_virgule ;
 
-expression = {ou} expression ou e1 |
-             {e1} e1;
+instrvide = point_virgule ;
 
-e1 = {et} e1 et e2 |
-     {e2} e2;
+//################################################################################
+// exp (booléennes, arithmétiques) avec implémentation des priorités.
+// ordre croissant de priorités comme suit (le | a la plus petite priorité)=
+// 7. | (ou)
+// 6. & (et)
+// 5. < =
+// 4. + -
+// 3. * /
+// 2. ! (non)
+// 1. (exp) appelfct var[exp]
+//###############################################################################*/
 
-e2 = {inferieur} e2 inf e3 |
-     {egal} e2 egal e3 |
-     {e3} e3;
+exp =
+{ou} exp ou exp1 |
+{exp1} exp1;
 
-e3 = {plus} e3 plus e4 |
-     {moins} e3 moins e4 |
-     {e4} e4;
+exp1 =
+{et} exp1 et exp2 |
+{exp2} exp2;
 
-e4 = {multiplication} e4 mult e5 |
-     {division} e4 div e5 |
-     {e5} e5;
+exp2 =
+{inf} exp2 inferieur exp3 |
+{egal} exp2 egal exp3 |
+{exp3} exp3;
 
-e5 = {non_logique} non e5 |
-     {e6} e6;
+exp3 =
+{plus} exp3 plus exp4 |
+{moins} exp3 moins exp4 |
+{exp4} exp4 ;
 
-e6 = {appel_fct} appel_fonction |
-     {variable} variable |
-     {parentheses} lpar expression rpar |
-     {nombre} nombre |
-     {lire} lire lpar rpar ;
+exp4 =
+{fois} exp4 fois exp5 |
+{divise} exp4 divise exp5 |
+{exp5} exp5 ;
 
+exp5 =
+{non} non exp5 |
+{exp6} exp6 ;
 
-variable = {variable_simple} identif |
-           {variable_tableau} identif crochetouvrant expression crochetfermant;
+exp6 =
+ {nombre} nombre |
+ {appelfct} appelfct |
+ {var} var |
+ {parentheses} parenthese_ouvrante exp parenthese_fermante |
+ {lire} lire parenthese_ouvrante parenthese_fermante ;
 
+// accès à une variable, case d'un tableau ou appel à fonction
 
-liste_expressions = {liste_expressions} expression liste_exp |
-                    {fin_rec_expressions} expression;
+var =
+{vartab} identif crochet_ouvrant exp crochet_fermant |
+{varsimple} identif ;
 
-liste_exp = {rec} virgule expression liste_exp |
-            {fin_rec_exp} virgule expression;
+listeexp =
+{recursif} exp listeexpbis|
+{final} ;
 
-appel_fonction = {avec_parametres} identif lpar liste_expressions rpar |
-                 {sans_parametres} identif lpar rpar;
+listeexpbis =
+{recursif} virgule exp listeexpbis |
+{final} ;
+
+appelfct = identif parenthese_ouvrante listeexp parenthese_fermante ;
